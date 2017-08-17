@@ -125,7 +125,8 @@ def run_tests():
                       ("2d", datetime(2017, 4, 29), datetime(2017, 5, 1)),
                       ("5d2m", datetime(2017, 11, 26), datetime(2018, 2, 1)),
                       ("3m2y", datetime(2017, 4, 4), datetime(2019, 7, 4)),
-                      ("24d3m1y", datetime(2018, 5, 19), datetime(2019, 9, 12))]
+                      ("24d3m1y", datetime(2018, 5, 19), datetime(2019, 9, 12)),
+                      ("1d", datetime(2017, 8, 17), datetime(2017, 8, 18))]
     for io in inputs_outputs:
         (i0, o, i1) = io
         ao = parse_duration_before(i0, i1)
@@ -402,6 +403,9 @@ if __name__ == "__main__":
         result = run_tests()
         sys.exit(result)
 
+    now = datetime.today()
+    print("Run at: %s" % str(now))
+
     api = todoist.TodoistAPI(API_TOKEN)
 
     # make sure we reset so sync will grab everything
@@ -435,7 +439,7 @@ if __name__ == "__main__":
                 start_date = get_date_from_str(item['date_added'])
 
                 item_date = parse_date(tag_str, start_date)
-                
+
                 add_label = item_date <= now
             elif BEFORE_TAG in name:
                 tag = BEFORE_TAG
@@ -444,7 +448,7 @@ if __name__ == "__main__":
                 item_date = get_date_from_str(item['due_date_utc'])
 
                 start_date = parse_duration_before(tag_str, item_date)
-
+                
                 add_label = start_date <= now
             elif IN_TAG in name:
                 tag = IN_TAG
