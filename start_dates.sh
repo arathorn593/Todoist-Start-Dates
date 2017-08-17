@@ -1,4 +1,4 @@
 #!/bin/bash
 
-source ~/Documents/Todoist/todoist-python/Env/bin/activate
-python ~/Documents/Todoist/todoist-python/start_dates.py
+source ~/Documents/Todoist/Todoist-Start-Dates/todoist-python/Env/bin/activate
+python3 ~/Documents/Todoist/Todoist-Start-Dates/todoist-python/start_dates.py
