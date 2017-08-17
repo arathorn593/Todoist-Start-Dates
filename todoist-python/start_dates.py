@@ -24,37 +24,37 @@ def run_tests():
     print("\n\n\n")
 
     print("Testing parse_sep_date...\n")
-    inputs_outputs_sep_date = [("08-17-17", datetime(2017, 8, 17)),
-                               ("8-44", (datetime(now.year, 8, 31) if datetime(now.year, 8, 31) > now else datetime(now.year+1, 8, 31))),
-                               ("9-31-20", datetime(2020, 9, 30)),
-                               ("12-1-18", datetime(2018, 12, 1)),
-                               ("12-08", (datetime(now.year, 12, 8) if datetime(now.year, 12, 8) > now else datetime(now.year+1, 12, 8))),
-                               ("1-1", datetime(now.year+1, 1, 1)),
-                               ("5/6/17", datetime(2017, 5, 6)),
-                               ("7/4", (datetime(now.year, 7, 4) if datetime(now.year, 7, 4) > now else datetime(now.year+1, 7, 4)))]
+    inputs_outputs_sep_date = [("08-17-17", datetime(2017, 8, 16), datetime(2017, 8, 17)),
+                               ("8-44", datetime(2017, 8, 16), datetime(2017, 8, 31)),
+                               ("9-31-20", datetime(2017, 8, 16), datetime(2020, 9, 30)),
+                               ("12-1-18", datetime(2017, 8, 16), datetime(2018, 12, 1)),
+                               ("12-08", datetime(2017, 8, 16), datetime(2017, 12, 8)),
+                               ("1-1", datetime(2017, 8, 16), datetime(2018, 1, 1)),
+                               ("5/6/17", datetime(2017, 8, 16), datetime(2017, 5, 6)),
+                               ("7/4", datetime(2017, 8, 16), datetime(2018, 7, 4))]
     for io in inputs_outputs_sep_date:
-        (i, o) = io
-        ao = parse_sep_date(i)
+        (i0, i1, o) = io
+        ao = parse_sep_date(i0, i1)
         if (ao != o):
-            print("test FAILED: parse_sep_date('%s')" % i)
+            print("test FAILED: parse_sep_date('%s', '%s')" % (i0, i1))
             print("\tExpectd: '%s'\n\tActual output: '%s'" % (o, ao))
             passed = False
         else:
-            print("pass: parse_sep_date('%s') = '%s'" % (i, o))
+            print("pass: parse_sep_date('%s', '%s') = '%s'" % (i0, i1, o))
     print("\n\n\n")
 
     print("Testing parse_old_date...\n")
-    inputs_outputs_old_date = [("081717", datetime(2017, 8, 17)),
-                               ("083117", datetime(2017, 8, 31)),
-                               ("093020", datetime(2020, 9, 30)),
-                               ("120118", datetime(2018, 12, 1)),
-                               ("120817", datetime(2017, 12, 8)),
-                               ("010118", datetime(2018, 1, 1)),
-                               ("050617", datetime(2017, 5, 6)),
-                               ("070417", datetime(2017, 7, 4)),
-                               ("111117", datetime(2017, 11, 11))]
+    inputs_outputs_old_date = [("081717", datetime(2017, 8, 16), datetime(2017, 8, 17)),
+                               ("083117", datetime(2017, 8, 16), datetime(2017, 8, 31)),
+                               ("093020", datetime(2017, 8, 16), datetime(2020, 9, 30)),
+                               ("120118", datetime(2017, 8, 16), datetime(2018, 12, 1)),
+                               ("120817", datetime(2017, 8, 16), datetime(2017, 12, 8)),
+                               ("010118", datetime(2017, 8, 16), datetime(2018, 1, 1)),
+                               ("050617", datetime(2017, 8, 16), datetime(2017, 5, 6)),
+                               ("070417", datetime(2017, 8, 16), datetime(2017, 7, 4)),
+                               ("111117", datetime(2017, 8, 16), datetime(2017, 11, 11))]
     for io in inputs_outputs_old_date:
-        (i, o) = io
+        (i, y, o) = io
         ao = parse_old_date(i)
         if (ao != o):
             print("test FAILED: parse_old_date('%s')" % i)
@@ -69,14 +69,14 @@ def run_tests():
     inputs_outputs.extend(inputs_outputs_sep_date)
     inputs_outputs.extend(inputs_outputs_old_date)
     for io in inputs_outputs:
-        (i, o) = io
-        ao = parse_date(i)
+        (i0, i1, o) = io
+        ao = parse_date(i0, i1)
         if (ao != o):
-            print("test FAILED: parse_date('%s')" % i)
+            print("test FAILED: parse_date('%s', '%s')" % (i0, i1))
             print("\tExpected: '%s'\n\tActual output: '%s'" % (o, ao))
             passed = False
         else:
-            print("pass: parse_date('%s') = '%s'" % (i, o))
+            print("pass: parse_date('%s', '%s') = '%s'" % (i0, i1, o))
     print("\n\n\n")
 
     print("Testing parse_duration...\n")
@@ -119,6 +119,13 @@ def run_tests():
     print("\n\n\n")
 
     print("Testing parse_duration_before...\n")
+    inputs_outputs = [("", datetime(2017, 8, 16), datetime(2017, 8, 16)),
+                      ("1d", datetime(2017, 1, 1), datetime(2017, 1, 2)),
+                      ("2d", datetime(2017, 1, 29), datetime(2017, 1, 31)),
+                      ("2d", datetime(2017, 4, 29), datetime(2017, 5, 1)),
+                      ("5d2m", datetime(2017, 11, 26), datetime(2018, 2, 1)),
+                      ("3m2y", datetime(2017, 4, 4), datetime(2019, 7, 4)),
+                      ("24d3m1y", datetime(2018, 5, 19), datetime(2019, 9, 12))]
     for io in inputs_outputs:
         (i0, o, i1) = io
         ao = parse_duration_before(i0, i1)
@@ -127,7 +134,21 @@ def run_tests():
             print("\tExpected: '%s'\n\tActual output: '%s'" % (o, ao))
             passed = False
         else:
-            print("pass: parse_duration_after('%s', '%s') = '%s'" % (i0, i1, o))
+            print("pass: parse_duration_before('%s', '%s') = '%s'" % (i0, i1, o))
+    print("\n\n\n")
+
+    print ("Testing get_date_from_str...\n")
+    inputs_outputs = [("Fri 26 Sep 2014 08:25:05 +0000", datetime(2014, 9, 26)),
+                      ("Mon 07 Aug 2006 12:34:56 +0000", datetime(2006, 8, 7))]
+    for io in inputs_outputs:
+        (i, o) = io
+        ao = get_date_from_str(i)
+        if (ao != o):
+            print("test FAILED: get_date_from_str('%s')" % i)
+            print("\tExpected: '%s'\n\tActual output: '%s'" % (o, ao))
+            passed = False
+        else:
+            print("pass: get_date_from_str('%s') = '%s'" % (i, o))
     print("\n\n\n")
 
     if passed:
@@ -154,6 +175,20 @@ YEAR_OFFSET=4       # offset from start of tag to year
 YEAR_LEN=2          # number of chars for year
 
 LABEL_NAME="Started"
+
+'''
+converts a string in todoist's date string format to a datetime object
+assume that the date string object is in utc
+
+@param date_str the date in todoist's date string format
+@returns datetime object representing the given date
+'''
+def get_date_from_str(date_str):
+    utc_date = datetime.strptime(date_str, "%a %d %b %Y %H:%M:%S %z")
+    date = utc_date.astimezone()
+    date = datetime(date.year, date.month, date.day)
+
+    return date
 
 '''
 constrains value to the range [min_val, max_val]
@@ -190,11 +225,12 @@ Takes a string with a date and returns a date object (next date not passed
 assumed if year ommitted)
 
 @param str the string containing a date
+@param start_date the date that the str was created
 @return datetime object with the same date as the string
 '''
-def parse_date(str):
+def parse_date(str, start_date):
     if ('-' in str or '/' in str):
-        return parse_sep_date(str)
+        return parse_sep_date(str, start_date)
     else:
         return parse_old_date(str)
 
@@ -202,14 +238,13 @@ def parse_date(str):
 Takes a string with a date with separators (- or /) and returns a datetime obj
     Expected form: "8-13-17" or "8-13" (year optional) Aug. 13th 2017
                    "8/13/17" or "8/13" (year optional) Aug. 13th 2017
-(next date not passed assumed if year ommitted)
+(next date not passed in start year assumed if year ommitted)
 
 @param date_str the string containing the date with dashes or slashes
+@param start_date the date that the date_str was written
 @returns datetime object with the same date as the string
 '''
-def parse_sep_date(date_str):
-    now = datetime.today()
-
+def parse_sep_date(date_str, start_date):
     nums = []
     if ('-' in date_str):
         nums = date_str.split('-')
@@ -231,7 +266,7 @@ def parse_sep_date(date_str):
             year = int(nums[2]) + 2000
         else:
             no_year = True
-            year = now.year
+            year = start_date.year
     except(ValueError):
         return now
 
@@ -243,7 +278,7 @@ def parse_sep_date(date_str):
 
     result = datetime(year, month, day)
     # make sure date is in the future
-    if (no_year and result < now):
+    if (no_year and result < start_date):
         result = datetime(year + 1, month, day)
 
     return result
@@ -318,7 +353,22 @@ before the other datetime object passed in
 @returns a datetime object the given duration before the given date
 '''
 def parse_duration_before(dur_str, date):
-    return datetime.min
+    (month, day, year) = (date.month, date.day, date.year)
+
+    (dur_day, dur_mon, dur_year) = parse_duration(dur_str)
+
+    year -= dur_year
+    month -= dur_mon
+
+    pos_month = abs(month)
+    if (month <= 0):
+        year -= pos_month // 12 + 1
+        month += (pos_month // 12 + 1) * 12
+
+    delta = timedelta(days=dur_day)
+    new_date = datetime(year, month, day) - delta
+
+    return new_date
 
 '''
 Takes a string with a time duration and a date and returns a datetime object
@@ -329,7 +379,22 @@ that duration after the date
 @returns the datetime object the given duration after the given date
 '''
 def parse_duration_after(dur_str, date):
-    return datetime.min
+    (month, day, year) = (date.month, date.day, date.year)
+
+    (dur_day, dur_mon, dur_year) = parse_duration(dur_str)
+
+    year += dur_year
+    month += dur_mon
+
+    if (month > 12):
+        year += month // 12
+        month = month % 12
+
+    delta = timedelta(days=dur_day)
+    new_date = datetime(year, month, day) + delta
+
+    return new_date
+
 
 # ------------- MAIN PROGRAM ----------------
 if __name__ == "__main__":
@@ -359,31 +424,50 @@ if __name__ == "__main__":
         try:
             error_str = ""
             tag_str = ""
+            tag = ""
             add_label = False
+            now = datetime.today()
 
             if START_TAG in name:
-                now = datetime.today()
+                tag = START_TAG
                 tag_str = get_tag_str(name, START_TAG)
 
-                item_date = parse_date(tag_str)
+                start_date = get_date_from_str(item['date_added'])
 
-                add_label = item_date < now
-            elif DURATION_TAG in name:
-                print("huh, this task has a delay tag... wish I could help: %s" %
-                      name)
+                item_date = parse_date(tag_str, start_date)
+                
+                add_label = item_date <= now
+            elif BEFORE_TAG in name:
+                tag = BEFORE_TAG
+                tag_str = get_tag_str(name, BEFORE_TAG)
+
+                item_date = get_date_from_str(item['due_date_utc'])
+
+                start_date = parse_duration_before(tag_str, item_date)
+
+                add_label = start_date <= now
+            elif IN_TAG in name:
+                tag = IN_TAG
+                tag_str = get_tag_str(name, IN_TAG)
+
+                item_date = get_date_from_str(item['date_added'])
+
+                start_date = parse_duration_after(tag_str, item_date)
+
+                add_label = start_date <= now
 
             # Update tag if need be
             item_id = item['id']
             item_labels = item['labels']
             if add_label:
+                print("adding tag to: '%s'" % name)
                 item_labels.append(start_label_id)
-                name = name.replace(tag_str, "")
+                name = name.replace(tag + tag_str, "")
                 api.items.update(item_id, labels=item_labels, content=name)
-            else:
-                if start_label_id in item_labels:
-                    item_labels.remove(start_label_id)
-                    api.items.update(item_id, labels=item_labels)
-        except:
+        except Exception as inst:
+            print(type(inst))    # the exception instance
+            print(inst.args)     # arguments stored in .args
+            print(inst)
             print("task: %s has an invalid start date string" % name)
             print("error str = \n%s" % error_str)
 
